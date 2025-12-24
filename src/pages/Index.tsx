@@ -37,7 +37,7 @@ const Index = () => {
           
           {/* Server Status */}
           <div className="max-w-lg mx-auto mt-8">
-            <ServerStatus serverAddress="smppractice.net" />
+            <ServerStatus serverAddress="play4.eternalzero.cloud:25958" />
           </div>
 
           {/* Discord Widget */}

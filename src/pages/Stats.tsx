@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { StarField } from "@/components/StarField";
 import { BackButton } from "@/components/BackButton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { Users, Swords, Trophy, Crown, Loader2 } from "lucide-react";
+import { MinecraftAvatar } from "@/components/MinecraftAvatar";
 
 interface LeaderboardPlayer {
   username: string | null;
@@ -125,12 +125,11 @@ const Stats = () => {
                       {index + 1}
                     </div>
                     
-                    <Avatar className="w-10 h-10 border border-border/50">
-                      <AvatarImage src={player.avatar_url || undefined} />
-                      <AvatarFallback className="bg-primary/20 text-primary">
-                        {player.username?.charAt(0).toUpperCase() || "?"}
-                      </AvatarFallback>
-                    </Avatar>
+                    <MinecraftAvatar 
+                      username={player.username} 
+                      size="md" 
+                      className="border border-border/50"
+                    />
                     
                     <div className="flex-1">
                       <p className="font-semibold text-foreground">{player.username || "İsimsiz Oyuncu"}</p>

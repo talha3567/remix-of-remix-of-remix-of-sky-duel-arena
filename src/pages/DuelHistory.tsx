@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { supabase } from "@/integrations/supabase/client";
-import { Swords, Trophy, Skull, Clock, MapPin, User } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Swords, Trophy, Clock, MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { MinecraftAvatar } from "@/components/MinecraftAvatar";
 
 interface DuelWithProfiles {
   id: string;
@@ -122,12 +122,7 @@ const DuelHistory = () => {
           : "bg-secondary/50 border border-border/50"
       }`}
     >
-      <Avatar className="w-10 h-10 border-2 border-primary/30">
-        <AvatarImage src={profile?.avatar_url || undefined} />
-        <AvatarFallback className="bg-primary/20 text-primary">
-          {profile?.username?.charAt(0).toUpperCase() || <User className="w-4 h-4" />}
-        </AvatarFallback>
-      </Avatar>
+      <MinecraftAvatar username={profile?.username || null} size="md" />
       <div className="flex-1 min-w-0">
         <p className="font-semibold text-foreground truncate">
           {profile?.username || "Bilinmeyen Oyuncu"}

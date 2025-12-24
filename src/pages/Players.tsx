@@ -3,9 +3,9 @@ import { Link, useParams } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { supabase } from "@/integrations/supabase/client";
 import { Search, User, Trophy, Skull, Swords, Target, Flame, Crown } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { MinecraftAvatar } from "@/components/MinecraftAvatar";
 
 interface Profile {
   id: string;
@@ -34,12 +34,11 @@ const PlayerCard = ({ player }: { player: Profile }) => {
       className="block bg-card/50 border border-border/50 rounded-xl p-4 hover:border-primary/50 hover:bg-card/70 transition-all group"
     >
       <div className="flex items-center gap-4">
-        <Avatar className="w-14 h-14 border-2 border-primary/30 group-hover:border-primary/60 transition-colors">
-          <AvatarImage src={player.avatar_url || undefined} />
-          <AvatarFallback className="bg-primary/20 text-primary text-lg">
-            {player.username?.charAt(0).toUpperCase() || <User className="w-6 h-6" />}
-          </AvatarFallback>
-        </Avatar>
+        <MinecraftAvatar 
+          username={player.username} 
+          size="lg" 
+          className="group-hover:border-primary/60 transition-colors"
+        />
         
         <div className="flex-1 min-w-0">
           <h3 className="font-bold text-foreground text-lg truncate group-hover:text-primary transition-colors">
@@ -158,12 +157,11 @@ const PlayerProfile = ({ userId }: { userId: string }) => {
           {/* Profile Header */}
           <div className="bg-card/50 border border-border/50 rounded-xl p-8 mb-8">
             <div className="flex flex-col md:flex-row items-center gap-6">
-              <Avatar className="w-24 h-24 border-4 border-primary/50">
-                <AvatarImage src={player.avatar_url || undefined} />
-                <AvatarFallback className="bg-primary/20 text-primary text-3xl">
-                  {player.username?.charAt(0).toUpperCase() || <User className="w-12 h-12" />}
-                </AvatarFallback>
-              </Avatar>
+              <MinecraftAvatar 
+                username={player.username} 
+                size="xl" 
+                className="border-4 border-primary/50"
+              />
               
               <div className="text-center md:text-left">
                 <h1 className="text-3xl font-bold text-foreground mb-2">
