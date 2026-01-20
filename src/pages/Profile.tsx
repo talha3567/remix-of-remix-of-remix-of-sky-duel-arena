@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "@/hooks/use-toast";
-import { Loader2, Camera, Swords, Trophy, Skull, Target, Flame, ArrowLeft } from "lucide-react";
+import { Loader2, Camera, Swords, Trophy, Skull, Target, Flame, ArrowLeft, TrendingDown } from "lucide-react";
 
 interface Profile {
   id: string;
@@ -23,10 +23,24 @@ interface Profile {
   best_win_streak: number;
 }
 
+interface PlayerStats {
+  id: string;
+  minecraft_username: string;
+  email: string | null;
+  kills: number;
+  deaths: number;
+  wins: number;
+  losses: number;
+  total_duels: number;
+  win_streak: number;
+  best_win_streak: number;
+}
+
 const Profile = () => {
   const { user, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [playerStats, setPlayerStats] = useState<PlayerStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [username, setUsername] = useState("");
@@ -37,15 +51,85 @@ const Profile = () => {
   }, [user, authLoading, navigate]);
 
   useEffect(() => {
-    if (user) fetchProfile();
+    if (user) {
+      fetchProfile();
+      fetchPlayerStats();
+    }
   }, [user]);
+
+  // Real-time subscription for player_stats
+  useEffect(() => {
+    if (!user?.email && !profile?.username) return;
+
+    const channel = supabase
+      .channel('player_stats_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'player_stats',
+        },
+        (payload) => {
+          const newData = payload.new as PlayerStats;
+          // Check if the update is for the current user
+          if (
+            (user?.email && newData.email === user.email) ||
+            (profile?.username && newData.minecraft_username === profile.username)
+          ) {
+            setPlayerStats(newData);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.email, profile?.username]);
 
   const fetchProfile = async () => {
     if (!user) return;
     const { data, error } = await supabase.from("profiles").select("*").eq("user_id", user.id).maybeSingle();
-    if (!error && data) { setProfile(data); setUsername(data.username || ""); }
+    if (!error && data) { 
+      setProfile(data); 
+      setUsername(data.username || ""); 
+    }
     setLoading(false);
   };
+
+  const fetchPlayerStats = async () => {
+    if (!user) return;
+    
+    // First try to find by email
+    let { data, error } = await supabase
+      .from("player_stats")
+      .select("*")
+      .eq("email", user.email)
+      .maybeSingle();
+    
+    // If not found by email, try by username (if profile exists)
+    if (!data && profile?.username) {
+      const result = await supabase
+        .from("player_stats")
+        .select("*")
+        .eq("minecraft_username", profile.username)
+        .maybeSingle();
+      data = result.data;
+      error = result.error;
+    }
+    
+    if (!error && data) {
+      setPlayerStats(data);
+    }
+  };
+
+  // Refetch player stats when profile username changes
+  useEffect(() => {
+    if (profile?.username) {
+      fetchPlayerStats();
+    }
+  }, [profile?.username]);
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || !e.target.files[0] || !user) return;
@@ -74,8 +158,19 @@ const Profile = () => {
 
   const handleSignOut = async () => { await signOut(); navigate("/"); };
 
-  const kdr = profile ? (profile.total_deaths > 0 ? (profile.total_kills / profile.total_deaths).toFixed(2) : profile.total_kills.toString()) : "0";
-  const winRate = profile ? (profile.total_duels > 0 ? ((profile.total_wins / profile.total_duels) * 100).toFixed(1) : "0") : "0";
+  // Use player_stats if available, otherwise fall back to profile stats
+  const stats = {
+    kills: playerStats?.kills ?? profile?.total_kills ?? 0,
+    deaths: playerStats?.deaths ?? profile?.total_deaths ?? 0,
+    wins: playerStats?.wins ?? profile?.total_wins ?? 0,
+    losses: playerStats?.losses ?? 0,
+    totalDuels: playerStats?.total_duels ?? profile?.total_duels ?? 0,
+    winStreak: playerStats?.win_streak ?? profile?.win_streak ?? 0,
+    bestWinStreak: playerStats?.best_win_streak ?? profile?.best_win_streak ?? 0,
+  };
+
+  const kdr = stats.deaths > 0 ? (stats.kills / stats.deaths).toFixed(2) : stats.kills.toString();
+  const winRate = stats.totalDuels > 0 ? ((stats.wins / stats.totalDuels) * 100).toFixed(1) : "0";
 
   if (authLoading || loading) return <div className="min-h-screen bg-background flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-foreground" /></div>;
 
@@ -122,18 +217,61 @@ const Profile = () => {
             </div>
 
             <div className="glass-card rounded-lg p-6 fade-in-delay-1">
-              <h2 className="text-lg font-semibold mb-6">İstatistikler</h2>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-secondary/30 rounded-lg p-3 text-center"><Swords className="w-5 h-5 text-foreground mx-auto mb-1" /><p className="text-xl font-bold">{profile?.total_kills || 0}</p><p className="text-xs text-muted-foreground">Öldürme</p></div>
-                <div className="bg-secondary/30 rounded-lg p-3 text-center"><Skull className="w-5 h-5 text-red-500 mx-auto mb-1" /><p className="text-xl font-bold">{profile?.total_deaths || 0}</p><p className="text-xs text-muted-foreground">Ölüm</p></div>
-                <div className="bg-secondary/30 rounded-lg p-3 text-center"><Trophy className="w-5 h-5 text-yellow-500 mx-auto mb-1" /><p className="text-xl font-bold">{profile?.total_wins || 0}</p><p className="text-xs text-muted-foreground">Galibiyet</p></div>
-                <div className="bg-secondary/30 rounded-lg p-3 text-center"><Target className="w-5 h-5 text-muted-foreground mx-auto mb-1" /><p className="text-xl font-bold">{profile?.total_duels || 0}</p><p className="text-xs text-muted-foreground">Düello</p></div>
-                <div className="bg-secondary/30 rounded-lg p-3 text-center"><Flame className="w-5 h-5 text-orange-500 mx-auto mb-1" /><p className="text-xl font-bold">{profile?.win_streak || 0}</p><p className="text-xs text-muted-foreground">Aktif Seri</p></div>
-                <div className="bg-secondary/30 rounded-lg p-3 text-center"><Flame className="w-5 h-5 text-green-500 mx-auto mb-1" /><p className="text-xl font-bold">{profile?.best_win_streak || 0}</p><p className="text-xs text-muted-foreground">En İyi Seri</p></div>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-semibold">İstatistikler</h2>
+                {playerStats && (
+                  <span className="text-xs text-green-500 flex items-center gap-1">
+                    <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                    Canlı
+                  </span>
+                )}
               </div>
-              <div className="mt-4 grid grid-cols-2 gap-3">
-                <div className="bg-secondary/30 rounded-lg p-4 text-center"><p className="text-2xl font-bold">{kdr}</p><p className="text-xs text-muted-foreground">K/D Oranı</p></div>
-                <div className="bg-secondary/30 rounded-lg p-4 text-center"><p className="text-2xl font-bold">{winRate}%</p><p className="text-xs text-muted-foreground">Kazanma Oranı</p></div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-secondary/30 rounded-lg p-3 text-center">
+                  <Swords className="w-5 h-5 text-foreground mx-auto mb-1" />
+                  <p className="text-xl font-bold">{stats.kills}</p>
+                  <p className="text-xs text-muted-foreground">Öldürme</p>
+                </div>
+                <div className="bg-secondary/30 rounded-lg p-3 text-center">
+                  <Skull className="w-5 h-5 text-red-500 mx-auto mb-1" />
+                  <p className="text-xl font-bold">{stats.deaths}</p>
+                  <p className="text-xs text-muted-foreground">Ölüm</p>
+                </div>
+                <div className="bg-secondary/30 rounded-lg p-3 text-center">
+                  <Trophy className="w-5 h-5 text-yellow-500 mx-auto mb-1" />
+                  <p className="text-xl font-bold">{stats.wins}</p>
+                  <p className="text-xs text-muted-foreground">Galibiyet</p>
+                </div>
+                <div className="bg-secondary/30 rounded-lg p-3 text-center">
+                  <TrendingDown className="w-5 h-5 text-red-400 mx-auto mb-1" />
+                  <p className="text-xl font-bold">{stats.losses}</p>
+                  <p className="text-xs text-muted-foreground">Mağlubiyet</p>
+                </div>
+                <div className="bg-secondary/30 rounded-lg p-3 text-center">
+                  <Target className="w-5 h-5 text-muted-foreground mx-auto mb-1" />
+                  <p className="text-xl font-bold">{stats.totalDuels}</p>
+                  <p className="text-xs text-muted-foreground">Düello</p>
+                </div>
+                <div className="bg-secondary/30 rounded-lg p-3 text-center">
+                  <Flame className="w-5 h-5 text-orange-500 mx-auto mb-1" />
+                  <p className="text-xl font-bold">{stats.winStreak}</p>
+                  <p className="text-xs text-muted-foreground">Aktif Seri</p>
+                </div>
+              </div>
+              <div className="mt-4 grid grid-cols-3 gap-3">
+                <div className="bg-secondary/30 rounded-lg p-4 text-center">
+                  <Flame className="w-5 h-5 text-green-500 mx-auto mb-1" />
+                  <p className="text-xl font-bold">{stats.bestWinStreak}</p>
+                  <p className="text-xs text-muted-foreground">En İyi Seri</p>
+                </div>
+                <div className="bg-secondary/30 rounded-lg p-4 text-center">
+                  <p className="text-2xl font-bold">{kdr}</p>
+                  <p className="text-xs text-muted-foreground">K/D Oranı</p>
+                </div>
+                <div className="bg-secondary/30 rounded-lg p-4 text-center">
+                  <p className="text-2xl font-bold">{winRate}%</p>
+                  <p className="text-xs text-muted-foreground">Kazanma Oranı</p>
+                </div>
               </div>
             </div>
           </div>
