@@ -50,6 +50,51 @@ export type Database = {
         }
         Relationships: []
       }
+      player_stats: {
+        Row: {
+          best_win_streak: number
+          created_at: string
+          deaths: number
+          email: string | null
+          id: string
+          kills: number
+          losses: number
+          minecraft_username: string
+          total_duels: number
+          updated_at: string
+          win_streak: number
+          wins: number
+        }
+        Insert: {
+          best_win_streak?: number
+          created_at?: string
+          deaths?: number
+          email?: string | null
+          id?: string
+          kills?: number
+          losses?: number
+          minecraft_username: string
+          total_duels?: number
+          updated_at?: string
+          win_streak?: number
+          wins?: number
+        }
+        Update: {
+          best_win_streak?: number
+          created_at?: string
+          deaths?: number
+          email?: string | null
+          id?: string
+          kills?: number
+          losses?: number
+          minecraft_username?: string
+          total_duels?: number
+          updated_at?: string
+          win_streak?: number
+          wins?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
