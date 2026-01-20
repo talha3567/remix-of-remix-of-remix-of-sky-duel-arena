@@ -2,13 +2,14 @@ import { Navbar } from "@/components/Navbar";
 import { DiscordWidget } from "@/components/DiscordWidget";
 import { ServerStatus } from "@/components/ServerStatus";
 import { SnowAnimation } from "@/components/SnowAnimation";
-import { Copy, Check, ExternalLink } from "lucide-react";
+import { Copy, Check, ExternalLink, Snowflake, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
 const Index = () => {
   const [copied, setCopied] = useState(false);
+  const [showSnow, setShowSnow] = useState(true);
 
   const handleCopyIP = async () => {
     try {
@@ -24,7 +25,25 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background text-foreground relative overflow-hidden">
       {/* Snow Animation Background */}
-      <SnowAnimation />
+      {showSnow && <SnowAnimation />}
+      
+      {/* Snow Toggle Button */}
+      <button
+        onClick={() => setShowSnow(!showSnow)}
+        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-2 glass-card rounded-lg text-sm text-muted-foreground hover:text-foreground transition-colors"
+      >
+        {showSnow ? (
+          <>
+            <EyeOff className="w-4 h-4" />
+            Hide Snow
+          </>
+        ) : (
+          <>
+            <Snowflake className="w-4 h-4" />
+            Show Snow
+          </>
+        )}
+      </button>
       
       <Navbar />
       
