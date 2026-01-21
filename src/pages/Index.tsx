@@ -193,21 +193,21 @@ const Index = () => {
 
       {/* Cat Strip Footer */}
       <div className="relative z-20">
-        {/* Cat on the strip */}
-        <div className="relative w-full flex justify-center">
-          <img 
-            src={catPawGif} 
-            alt="Cute cat" 
-            className="w-20 h-auto relative z-10"
-            style={{ 
-              imageRendering: 'pixelated',
-              marginBottom: '-2px'
-            }}
-          />
+        {/* Red Strip Line with Cat */}
+        <div className="relative w-full">
+          <div className="w-full h-[2px] bg-gradient-to-r from-red-900 via-red-600 to-red-900" />
+          {/* Cat sitting on the strip */}
+          <div className="absolute left-1/2 -translate-x-1/2 bottom-0">
+            <img 
+              src={catPawGif} 
+              alt="Cute cat" 
+              className="w-24 h-auto"
+              style={{ 
+                imageRendering: 'pixelated'
+              }}
+            />
+          </div>
         </div>
-        
-        {/* Red Strip Line */}
-        <div className="w-full h-[2px] bg-gradient-to-r from-red-900 via-red-600 to-red-900" />
         
         {/* Made with love text */}
         <div className="bg-background py-4 text-center">
