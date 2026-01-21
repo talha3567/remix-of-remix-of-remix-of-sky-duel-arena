@@ -197,7 +197,7 @@ const Index = () => {
         <div className="relative w-full">
           <div className="w-full h-[2px] bg-gradient-to-r from-red-900 via-red-600 to-red-900" />
           {/* Cat sitting on the strip */}
-          <div className="absolute left-1/2 -translate-x-1/2 bottom-0">
+          <div className="absolute left-1/2 -translate-x-1/2 top-0 -translate-y-[85%]">
             <img 
               src={catPawGif} 
               alt="Cute cat" 
