@@ -204,7 +204,7 @@ const Index = () => {
               className="w-24 h-auto"
               style={{ 
                 imageRendering: 'pixelated',
-                transform: 'rotate(-5deg)'
+                transform: 'rotate(-15deg)'
               }}
             />
           </div>
