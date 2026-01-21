@@ -48,6 +48,7 @@ export const Navbar = () => {
 
   const navLinks = [
     { to: "/", label: "Anasayfa" },
+    { to: "/leaderboard", label: "Liderlik" },
   ];
 
   return (
