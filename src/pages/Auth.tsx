@@ -15,7 +15,10 @@ const loginSchema = z.object({
 });
 
 const signupSchema = loginSchema.extend({
-  username: z.string().min(3, "Kullanıcı adı en az 3 karakter olmalıdır"),
+  username: z.string()
+    .min(3, "Kullanıcı adı en az 3 karakter olmalıdır")
+    .max(20, "Kullanıcı adı en fazla 20 karakter olabilir")
+    .regex(/^[a-zA-Z0-9_-]+$/, "Sadece harf, rakam, alt çizgi ve tire kullanılabilir"),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Şifreler eşleşmiyor",
