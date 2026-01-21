@@ -6,7 +6,7 @@ import { Copy, Check, ExternalLink, Snowflake, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-
+import catPawGif from "@/assets/cat-paw.gif";
 const Index = () => {
   const [copied, setCopied] = useState(false);
   const [showSnow, setShowSnow] = useState(true);
@@ -190,6 +190,29 @@ const Index = () => {
           </div>
         </div>
       </footer>
+
+      {/* Cat Strip Footer */}
+      <div className="relative z-20">
+        {/* Red Strip Line */}
+        <div className="w-full h-1 bg-gradient-to-r from-red-900 via-red-600 to-red-900" />
+        
+        {/* Cat on the strip */}
+        <div className="relative w-full flex justify-center">
+          <img 
+            src={catPawGif} 
+            alt="Cute cat" 
+            className="w-20 h-auto absolute -top-12 transform"
+            style={{ imageRendering: 'pixelated' }}
+          />
+        </div>
+        
+        {/* Made with love text */}
+        <div className="bg-background py-4 text-center">
+          <p className="text-sm text-muted-foreground">
+            made with <span className="text-red-500">❤</span>
+          </p>
+        </div>
+      </div>
     </div>
   );
 };
