@@ -45,6 +45,26 @@ const Auth = () => {
     e.preventDefault();
     setIsLoading(true);
 
+    // Helper function to get safe error message
+    const getAuthErrorMessage = (error: { message?: string }, context: 'login' | 'signup'): string => {
+      const message = error.message || '';
+      
+      // Map known error messages to safe, localized versions
+      if (message.includes('Invalid login credentials')) return 'Email veya şifre hatalı';
+      if (message.includes('Email not confirmed')) return 'Lütfen emailinizi onaylayın';
+      if (message.includes('already registered')) return 'Bu email adresi zaten kayıtlı';
+      if (message.includes('Password should be at least')) return 'Şifre en az 6 karakter olmalıdır';
+      if (message.includes('Invalid email')) return 'Geçersiz email adresi';
+      if (message.includes('User not found')) return 'Email veya şifre hatalı';
+      if (message.includes('Username must be')) return 'Kullanıcı adı 3-20 karakter olmalıdır';
+      if (message.includes('Username can only contain')) return 'Kullanıcı adı sadece harf, rakam, _ ve - içerebilir';
+      
+      // Generic fallback - never expose raw error messages
+      return context === 'login' 
+        ? 'Email veya şifre hatalı' 
+        : 'Kayıt işlemi başarısız oldu. Lütfen tekrar deneyin.';
+    };
+
     try {
       if (isLogin) {
         const validation = loginSchema.safeParse({ email, password });
@@ -56,7 +76,7 @@ const Auth = () => {
 
         const { error } = await signIn(email, password);
         if (error) {
-          toast({ title: "Giriş Hatası", description: error.message === "Invalid login credentials" ? "Email veya şifre hatalı" : error.message, variant: "destructive" });
+          toast({ title: "Giriş Hatası", description: getAuthErrorMessage(error, 'login'), variant: "destructive" });
         } else {
           toast({ title: "Hoş geldiniz!", description: "Başarıyla giriş yaptınız." });
           navigate("/");
@@ -71,7 +91,7 @@ const Auth = () => {
 
         const { error } = await signUp(email, password, username);
         if (error) {
-          toast({ title: "Kayıt Hatası", description: error.message.includes("already registered") ? "Bu email adresi zaten kayıtlı." : error.message, variant: "destructive" });
+          toast({ title: "Kayıt Hatası", description: getAuthErrorMessage(error, 'signup'), variant: "destructive" });
         } else {
           toast({ title: "Kayıt Başarılı!", description: "Hesabınız oluşturuldu. Hoş geldiniz!" });
           navigate("/");

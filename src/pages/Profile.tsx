@@ -134,7 +134,39 @@ const Profile = () => {
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || !e.target.files[0] || !user) return;
     const file = e.target.files[0];
-    const filePath = `${user.id}/${Date.now()}.${file.name.split(".").pop()}`;
+    
+    // Validate file size (5MB limit)
+    const MAX_FILE_SIZE = 5 * 1024 * 1024;
+    if (file.size > MAX_FILE_SIZE) {
+      toast({ title: "Hata", description: "Dosya boyutu 5MB'dan küçük olmalıdır", variant: "destructive" });
+      return;
+    }
+    
+    // Validate file type
+    const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      toast({ title: "Hata", description: "Sadece JPG, PNG, GIF ve WebP formatları desteklenir", variant: "destructive" });
+      return;
+    }
+    
+    // Validate file is actually an image
+    const isValidImage = await new Promise<boolean>((resolve) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => { URL.revokeObjectURL(url); resolve(img.width <= 4096 && img.height <= 4096); };
+      img.onerror = () => { URL.revokeObjectURL(url); resolve(false); };
+      img.src = url;
+    });
+    
+    if (!isValidImage) {
+      toast({ title: "Hata", description: "Geçersiz resim dosyası veya boyut çok büyük", variant: "destructive" });
+      return;
+    }
+    
+    // Use MIME type for extension (not user-provided filename)
+    const extension = file.type.split('/')[1] === 'jpeg' ? 'jpg' : file.type.split('/')[1];
+    const filePath = `${user.id}/${Date.now()}.${extension}`;
+    
     setUploading(true);
     if (profile?.avatar_url) {
       const oldPath = profile.avatar_url.split("/avatars/")[1];
