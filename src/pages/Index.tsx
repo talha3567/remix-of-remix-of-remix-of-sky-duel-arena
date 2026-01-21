@@ -6,7 +6,7 @@ import { Copy, Check, ExternalLink, Snowflake, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import pixelCat from "@/assets/pixel-cat.png";
+import catPawGif from "@/assets/cat-paw.gif";
 const Index = () => {
   const [copied, setCopied] = useState(false);
   const [showSnow, setShowSnow] = useState(true);
@@ -196,9 +196,9 @@ const Index = () => {
         {/* Cat on the strip */}
         <div className="relative w-full flex justify-center">
           <img 
-            src={pixelCat} 
-            alt="Pixel cat" 
-            className="w-24 h-auto relative z-10"
+            src={catPawGif} 
+            alt="Cute cat" 
+            className="w-20 h-auto relative z-10"
             style={{ 
               imageRendering: 'pixelated',
               marginBottom: '-2px'
