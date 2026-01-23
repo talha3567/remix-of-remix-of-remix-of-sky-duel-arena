@@ -144,7 +144,7 @@ const Index = () => {
                 </div>
 
                 <a
-                  href="https://discord.gg/eG4Tyz5Grq"
+                  href="https://discord.gg/9DrsARD6"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105"
