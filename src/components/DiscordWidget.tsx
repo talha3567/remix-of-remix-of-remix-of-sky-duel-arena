@@ -3,7 +3,7 @@ import { MessageSquare, Users, ExternalLink } from "lucide-react";
 export const DiscordWidget = () => {
   return (
     <a
-      href="https://discord.gg/smpprac"
+      href="https://discord.gg/eG4Tyz5Grq"
       target="_blank"
       rel="noopener noreferrer"
       className="block glass-card rounded-lg p-4 hover-glow group"
